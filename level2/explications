@@ -1,0 +1,33 @@
+Le binaire fait appel a la fonction p qui appel gets
+les entres dans gets ne sont pas protegés.
+Il y a tout de meme une verfication de l'adresse de retour sur la stack
+qui empeche l'appel de toutes adresses commencant par 0xb
+pour exploiter ce binaire il faut faire un return sur return
+
+premiere etape, trouver la longeur de la string qui nous permet d'ecrire sur la stack.
+
+la limite est a 80
+
+ensuite entrer l'adresse du return pour que la premiere adresse sur la stack soit ecrasée par celle du return dans la fonction p
+
+>pdisas p
+...
+...
+0x0804853e <+106>:	ret
+End of assembler dump.
+
+ensuite trouver l'adresse de l'appel a la fonction system
+>break main
+>run
+>print system
+$1 = {<text variable, no debug info>} 0xb7e6b060 <system>
+
+a l'appel de system l'adresse de retour de l'instruction suivante est injecter dans la stack, il faut l'ecraser afin de ne pas revenir dessus et ainsi eviter le segfault. en l'occurence on va mettre "BBBB" qui ne correspond a rien afin de pouvoir directement passer a l'instruction suivante sur la stack sans qu'il n'y ai eu d'influence.
+
+Il ne reste plus qu'a trouver l'appel de /bin/sh dans la libc
+>find 0xb7e6b060,+9999999,"/bin/sh"
+0xb7f8cc58
+warning: Unable to access target memory at 0xb7fd3160, halting search.
+1 pattern found.
+
+Nous avons a present tous les elements pour creer notre script
