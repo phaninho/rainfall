@@ -2,7 +2,7 @@ Le binaire fait appel a la fonction p qui appel gets
 les entres dans gets ne sont pas protegés.
 Il y a tout de meme une verfication de l'adresse de retour sur la stack
 qui empeche l'appel de toutes adresses commencant par 0xb
-pour exploiter ce binaire il faut faire un return sur return
+pour exploiter ce binaire il faut faire un return sur return qui a une adresse differente a 0xb pour passer l'etape de la comparaison qui nous ferai exit directment
 
 premiere etape, trouver la longeur de la string qui nous permet d'ecrire sur la stack.
 
