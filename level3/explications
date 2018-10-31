@@ -1,0 +1,24 @@
+ce gets ne permet pas de segfault, cela dit il y a un printf de la string saise dans le gets et ensuite, une comparaison est faite entre la variable m et la valeur 0x40
+Il va falloir exploiter la faille du Format String
+
+pour cela il faut tout dabord trouver l'adresse de la variable m
+trouver l'offset dans lequel on ecrit dans le buffer.
+
+pour l'adresse on peut utiliser objdumd -t level3
+ou bien disas v dans gdb et recuperer l'adresse qui est mov dans eax avant le cmp
+
+pour l'offset il suffit d'ecrire AAAA par exemple et plusieurs fois %x pour que les valeurs dans la stack s'affichent
+la string AAAA est stocké a la 4 eme adresse de la stack
+
+on va utiliser le bug du %n pour ecrire dans la variable indiqué
+cette option de printf permet de stocker le nombre de caractere ecrit par printf a l'adresse de la variable indiqué
+
+on va donc stocker une longeur == a 64 qui donne 0x40 dans la variable m
+située a l'adresse 0x804988c
+
+dans le script il faut donc commencer par ecrire l'adresse de la variable pour qu'il soit stocké a la 4eme adresse de la stack, ensuite ecrire 60 characteres pour atteindre un total de 64 caractere et enfin indiquer qu'on veux stocker cette valeur dans le 4 eme argument en utilisant %4$n
+(voir le fichier script complet)
+
+ensuite
+
+~cat exploit - | ./level3
