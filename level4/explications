@@ -1,0 +1,39 @@
+il y a un gets avec un buffer protegé, et un printf aillant le meme soucis que dans l'exo precedant. ca va encore etre un Format string exploit.
+
+dans la fonction 'n' on compare le eax avec la valeur 0x1025544 afin d'acceder au pass du level5.
+juste avant cette comparaison on attibut a eax la valeur de la variable "m"
+
+dans un premier temps il faut reperer l'offset dans lequel on ecrit sur la stack
+
+    python "print 'AAAA' + '%x' * 30"
+la 12 adresse contient 41414141
+
+il y a deux maniere de faire, soit refaire le meme principe que lors de l'exo precedant, c'est a dire ecrire 0x1025544 characteres = 16930116
+(voir brut.py) cela prend beaucoup de temps mais ca fonctionne.
+
+Soit reecrire la valeur en deux temps. 5544 dans un premier temps ensuite 102.
+Il faut dabbord indiquer l'adresse de la variable 'm' suivi de 'm+2' ce qui va pointer sur l'adresse des bits superieur a cette meme adresse.
+
+dans 'm' on va ecrire la valeur 21820 qui correspond a 0x5544 - 8 (pour les deux adresses en debut de chaine) ensuite preciser que c'est bien dans la 12eme adresse de la stack qu'on ecrit
+
+    "%21820x"
+    "%12n"
+
+pour les bits superieur il faut donc ajouter 0x0102 = 258
+mais en faisant un test d'ajout de 30 charactere on tombe sur une valeur bien superieur a celle esperé. 0x5562
+pour obtenir le bon resultat il faut considerer que 0x0102 vaut en fait
+0x10102 et faire la soustraction
+
+    0x10102 - 0x5562 = 43936
+    auxquelles ont ajoute 30 pour les 30 characteres ecrit lors du test
+ce qui nous donne un total de 43966
+
+    "%43966x"
+    "%13n"
+
+(voir elegant.py)
+
+    ./eploit.py > exploit
+    cat exploit - | ./level4
+
+flag apparait

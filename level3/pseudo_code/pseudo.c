@@ -1,8 +1,8 @@
 
 int v()
 {
-    fgets(*var);
-    printf(*var);
+    var = fgets();
+    printf(var);
     eax = *m;
     if (eax == 0x40)
     {

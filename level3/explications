@@ -1,13 +1,13 @@
 ce gets ne permet pas de segfault, cela dit il y a un printf de la string saise dans le gets et ensuite, une comparaison est faite entre la variable m et la valeur 0x40
 Il va falloir exploiter la faille du Format String
 
-pour cela il faut tout dabord trouver l'adresse de la variable m
+pour cela il faut tout dabord trouver l'adresse de la variable m puis ß
 trouver l'offset dans lequel on ecrit dans le buffer.
 
 pour l'adresse on peut utiliser objdumd -t level3
 ou bien disas v dans gdb et recuperer l'adresse qui est mov dans eax avant le cmp
 
-pour l'offset il suffit d'ecrire AAAA par exemple et plusieurs fois %x pour que les valeurs dans la stack s'affichent
+pour l'offset il suffit d'ecrire AAAA par exemple et plusieurs fois %x pour que les valeurs dans la sßtack s'affichent
 la string AAAA est stocké a la 4 eme adresse de la stack
 
 on va utiliser le bug du %n pour ecrire dans la variable indiqué
