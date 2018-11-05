@@ -1,0 +1,3 @@
+le programme attend un argument afin de faire un strcpy dans une variable qui a ete malloc sur une taille de 64, si on injecte 72 caracteres on accede a la heap, il suffit de mettre a la suite l'adresse de la fonction n qui affichera le flag du level7
+
+./level6 `cat /tmp/exploit`
