@@ -28,10 +28,10 @@ void    main(int ac, char **av)
         _exit(1);
     else
     {
-        ebx = operator new(0x6c);
+        ebx = operator new(N);
         N::N(ebx);
         char *var_8 = ebx;
-        ebx = operator new(0x6c);
+        ebx = operator new(N);
         N::N(ebx);
         N::setAnnotation(var_8);
         (**ebx)(ebx, var_8);

