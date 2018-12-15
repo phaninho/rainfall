@@ -1,0 +1,21 @@
+on voit dans le code que le premier argument est atoi et doit etre inferieur a 9
+afin de passer a l'instruction suivante. cette meme valeur est castée en size_t
+et multipliée par 4, elle sert de taille pour le memcpy du 2eme argument
+dans le buffer qui fait une taille de 40.
+
+Afin d'exploiter ce bianire il faut provoquer un int underflow qui passera le
+premier test et servira au memcpy. il faut egalement que la variable qui a ete
+atoi soit egale a 0x574f4c46
+
+en examinant la stack on voit que le buffer de la variable de destination du memcpy
+commence 40 unitees avant la variable qui a servi a stocker le atoi.
+Cette meme variable est comparee avec 0x574f4c46.
+On va en deuxieme argument mettre un string faisant 40 char + \x46\x4c\x4f\x57.
+
+pour le premiere argument il faut trouver une valeur qui soit inferieur a 9 mais
+superieur a 44 lors du cast en size_t et * 4.
+La valeur size_t(-2147483637 * 4) = 44
+en Saisissant cette valeur en premier argument, le memcpy aura une len = 44, ce
+qui sera suffisant pour ecrire sur l'espace qui sera comparé a la valeur 0x574f4c46.
+
+./bonus1 -2147483637 `python -c 'print "A"*40 + "\x46\x4c\x4f\x57"'`
