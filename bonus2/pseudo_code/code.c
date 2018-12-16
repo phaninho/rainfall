@@ -35,13 +35,12 @@ int greetuser(int buf)
 
 int main(int ac, char **av)
 {
-    var = av[1];
     esp = (esp & 0xfffffff0) - 160;
     if (ac != 3)
         return 1;
-    strncpy(&dest, var, 40);
+    strncpy(&dest, av[1], 40);
     len = 32;
-    src = *(var + 8);
+    src = av[2];
     strncpy(&dest + 40, src, len);
     buf = 0x8048738;
     env_value = getenv(buf);
