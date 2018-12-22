@@ -13,7 +13,7 @@ Cette meme variable est comparee avec 0x574f4c46.
 On va en deuxieme argument mettre un string faisant 40 char + \x46\x4c\x4f\x57.
 
 pour le premiere argument il faut trouver une valeur qui soit inferieur a 9 mais
-superieur a 44 lors du cast en size_t et * 4.
+superieur a 44 lors du cast en size_t.
 La valeur size_t(-2147483637 * 4) = 44
 en Saisissant cette valeur en premier argument, le memcpy aura une len = 44, ce
 qui sera suffisant pour ecrire sur l'espace qui sera comparé a la valeur 0x574f4c46.

