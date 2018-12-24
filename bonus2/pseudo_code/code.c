@@ -27,6 +27,5 @@ int main(int ac, char **av)
         else if (memcmp(env_value, "nl", 2) == 0)
             *language = 2;
     }
-    strncpy(env_value, dest, 19)
     return (greetuser(dest));
 }
