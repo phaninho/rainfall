@@ -1,0 +1,10 @@
+en faisant objdump -d sur le binaire on trouve un main et une foncion run qui n'est pas
+appele et qui permet de lancer un shell.
+dans le main il y a un l'appel a gets que nous allons exploiter avec un bufferoverflow.
+dans un premier temps nous trouvons la longueur a partir de laquelle nous pouvons ecrire
+dans la stack grace a gdb et un bufferoverflow generator ensuit on insere l'adresse de run.
+il va nous falloir une string de 76
+la commande finale
+
+	python -c 'print "A" * 76 + "\x44\x84\x04\08x"' > /tmp/exploit
+	cat /tmp/exploit - | ./level1
