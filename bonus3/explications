@@ -1,0 +1,8 @@
+le programme prend un argument qui se fait atoi.
+la ligne buffer[atoi(av[1])] = '\0' donne une valeur au buffer
+la condition pour acceder au /bin/sh est que la comparaison entre le premier 
+argument et la valeur stocke dans le buffer soit les memes cad '\0'.
+pour cela il faut mettre un argument vide tel que "" afin que atoi return 0 et
+que la comparaison soit vrai
+
+./bonus3 ""
