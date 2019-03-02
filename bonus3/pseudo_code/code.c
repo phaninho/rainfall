@@ -5,7 +5,7 @@ int main(int ac, char **av)
     {
         fread(&buf, 1, 66, fd);
         buf[atoi(av[1])] = '\0';
-        fread(&buf + 66, 1, 65, fd);
+        fread(&buf, 1, 65, fd);
         fclose(fd);
         if (strcmp(&buf, av[1]) == 0)
             execl("/bin/sh", "sh");

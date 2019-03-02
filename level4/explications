@@ -19,6 +19,12 @@ dans 'm' on va ecrire la valeur 21820 qui correspond a 0x5544 - 8 (pour les deux
     "%21820x"
     "%12n"
 
+Sous gdb on peut confirmer que cette valeur a bien ete passee a la variable m en
+l'affichant
+
+	(gdb) x/w 0x8049810
+	0x8049810 <m>:	 U"\x55625544"
+
 pour les bits superieur il faut donc ajouter 0x0102 = 258
 mais en faisant un test d'ajout de 30 charactere on tombe sur une valeur bien superieur a celle esperé. 0x5562
 pour obtenir le bon resultat il faut considerer que 0x0102 vaut en fait
